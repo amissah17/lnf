@@ -353,7 +353,11 @@ function Navbar({ router }: { router: ReturnType<typeof useRouter> }) {
   );
 }
 
-function HeroSection({ search, setSearch, router }) {
+function HeroSection({ search, setSearch, router }: { 
+  search: string; 
+  setSearch: (val: string) => void; 
+  router: ReturnType<typeof useRouter>;
+}) {
   return (
     <section
       style={{
@@ -506,7 +510,7 @@ function HeroSection({ search, setSearch, router }) {
   );
 }
 
-function StatusBadge({ status }) {
+function StatusBadge({ status }: { status: string  }) {
   const isFound = status === "found";
   return (
     <span
