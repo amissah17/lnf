@@ -221,7 +221,7 @@ const footerLinks = {
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
-function Navbar({router}) {
+function Navbar({ router }: { router: ReturnType<typeof useRouter> }) {
   return (
     <nav
       style={{
@@ -353,7 +353,7 @@ function Navbar({router}) {
   );
 }
 
-function HeroSection({ search, setSearch, router }) {
+function HeroSection({ search, setSearch, { router }: { router: ReturnType<typeof useRouter> } }) {
   return (
     <section
       style={{
