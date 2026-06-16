@@ -1,3 +1,6 @@
+"use client";
+
+
 export default function ComingSoonPage({ title }: { title: string }) {
   return (
     <div style={{ minHeight: "100vh", background: "#F8FAFC", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", display: "flex", flexDirection: "column" }}>
