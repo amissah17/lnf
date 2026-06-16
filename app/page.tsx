@@ -93,87 +93,7 @@ const UserIcon = () => (
   </svg>
 );
 
-// ─── Category icons ───────────────────────────────────────────────────────────
-const categoryIcons = {
-  Electronics: (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2" y="3" width="20" height="14" rx="2" />
-      <path d="M8 21h8M12 17v4" />
-    </svg>
-  ),
-  Pets: (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 1.725 1.722 3.656 1 1.261-.472 1.96-1.45 2.344-2.5M14.267 5.172c0-1.39 1.577-2.493 3.5-2.172 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.855-1.45-2.344-2.5M8 14v.5M16 14v.5M11.25 16.25h1.5L12 17z" />
-      <path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444c0-1.061-.162-2.2-.493-3.309m-9.243-6.082A8.801 8.801 0 0 1 12 5c.78 0 1.5.108 2.161.313" />
-    </svg>
-  ),
-  Wallets: (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="1" y="4" width="22" height="16" rx="2" />
-      <path d="M1 10h22" />
-    </svg>
-  ),
-  Keys: (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="7.5" cy="15.5" r="5.5" />
-      <path d="m21 2-9.6 9.6M15.5 7.5l3 3L22 7l-3-3" />
-    </svg>
-  ),
-  Bags: (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18" />
-      <path d="M16 10a4 4 0 0 1-8 0" />
-    </svg>
-  ),
-};
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-const categories = ["Electronics", "Pets", "Wallets", "Keys", "Bags"];
 
 // const recentItems = [
 //   {
@@ -398,7 +318,7 @@ function HeroSection({ search, setSearch, router }: {
       <div
         style={{
           maxWidth: 560,
-          margin: "0 auto 24px",
+          margin: "0 auto",
           display: "flex",
           gap: 0,
           background: "#fff",
@@ -463,52 +383,17 @@ function HeroSection({ search, setSearch, router }: {
         </button>
       </div>
 
-      {/* Category pills */}
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          justifyContent: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        {categories.map((cat) => (
-          <Link
-            key={cat}
-            href={`/categories/${cat}`}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "7px 16px",
-              borderRadius: 99,
-              border: "1.5px solid #CBD5E1",
-              background: "#fff",
-              fontSize: 13,
-              color: "#374151",
-              fontWeight: 500,
-              cursor: "pointer",
-              transition: "all 0.15s",
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = "#2563EB";
-              e.currentTarget.style.color = "#2563EB";
-              e.currentTarget.style.background = "#EFF6FF";
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = "#CBD5E1";
-              e.currentTarget.style.color = "#374151";
-              e.currentTarget.style.background = "#fff";
-            }}
-          >
-            {categoryIcons[cat]}
-            {cat}
-          </Link>
-        ))}
-      </div>
     </section>
   );
 }
+
+type Item = {
+  id: number | string;
+  title: string;
+  location: string;
+  status: string;
+  photos?: string[] | null;
+};
 
 function StatusBadge({ status }: { status: string  }) {
   const isFound = status === "found";
@@ -533,7 +418,7 @@ function StatusBadge({ status }: { status: string  }) {
   );
 }
 
-function ItemCard({ item }) {
+function ItemCard({ item }: { item: Item }) {
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -618,7 +503,7 @@ function ItemCard({ item }) {
   );
 }
 
-function RecentlyFoundSection({ items }) {
+function RecentlyFoundSection(  { items }: { items: Item[] }) {
   return (
     <section style={{ maxWidth: 1200, margin: "0 auto", padding: "64px 24px" }}>
       <div
@@ -866,10 +751,9 @@ export default function HomePage() {
   const [search, setSearch] = useState("");
   const router = useRouter();
   const supabase = createClient();
-  
-const [recentItems, setRecentItems] = useState([]);
+  const [recentItems, setRecentItems] = useState<Item[]>([]);
 
-useEffect(() => {
+  useEffect(() => {
   async function fetchItems() {
     const { data } = await supabase
       .from("items")
