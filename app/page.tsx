@@ -353,7 +353,7 @@ function Navbar({ router }: { router: ReturnType<typeof useRouter> }) {
   );
 }
 
-function HeroSection({ search, setSearch, { router }: { router: ReturnType<typeof useRouter> } }) {
+function HeroSection({ search, setSearch, router }) {
   return (
     <section
       style={{
