@@ -26,7 +26,7 @@ function EyeIcon({ open }: { open: boolean }) {
   );
 }
 
-export default function AuthPage() {
+export default function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/";
