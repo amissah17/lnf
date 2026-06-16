@@ -269,7 +269,7 @@ function Navbar({ router }: { router: ReturnType<typeof useRouter> }) {
                 fontSize: 14,
                 fontWeight: alink.name === "Home" ? 600 : 400,
                 color: alink.name === "Home" ? "#2563EB" : "#475569",
-                textDecoration: alink === "Home" ? "underline" : "none",
+                textDecoration: alink.name === "Home" ? "underline" : "none",
                 textUnderlineOffset: 4,
               }}
             >
