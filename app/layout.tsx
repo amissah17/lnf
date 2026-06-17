@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FoundLink – Reconnect with what you've lost",
+  title: "LostandFound – Reconnect with what you've lost",
   description: "Community-powered lost and found. Report found items or search for your belongings.",
 };
 
