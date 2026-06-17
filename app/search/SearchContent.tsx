@@ -84,7 +84,7 @@ function Navbar({ query, setQuery, onSearch }: { query: string; setQuery: (q: st
   return (
     <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", borderBottom: "1px solid #E2E8F0" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-        <Link href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none", flexShrink: 0 }}>FoundLink</Link>
+        <Link href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none", flexShrink: 0 }}>LostandFound</Link>
 
         {isMobile ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -485,8 +485,8 @@ export default function SearchPage() {
       <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: isMobile ? "24px 16px" : "28px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: 16 }}>
           <div>
-            <p style={{ fontWeight: 700, fontSize: isMobile ? 16 : 15, color: "#1E3A8A", marginBottom: 2 }}>FoundLink</p>
-            <p style={{ fontSize: 12, color: "#94A3B8" }}>© 2024 FoundLink. All rights reserved.</p>
+            <p style={{ fontWeight: 700, fontSize: isMobile ? 16 : 15, color: "#1E3A8A", marginBottom: 2 }}>LostandFound</p>
+            <p style={{ fontSize: 12, color: "#94A3B8" }}>© 2024 LostandFound. All rights reserved.</p>
           </div>
           <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexWrap: "wrap" }}>
             {[{name:"Community Guidelines", url:"/community-guidelines"}, {name:"Safety Tips", url:"/safety-tips"}, {name:"Privacy Policy", url:"/privacy-policy"}, {name:"Contact Support", url:"/contact-support"}].map((l) => (

@@ -76,7 +76,7 @@ function Navbar({ router }: { router: ReturnType<typeof useRouter> }) {
     <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", borderBottom: "1px solid #E2E8F0" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         {/* Logo */}
-        <span style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px" }}>FoundLink</span>
+        <span style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px" }}>LostandFound</span>
 
         {isMobile ? (
           // Mobile: hamburger + icons
@@ -167,7 +167,7 @@ function HeroSection({ search, setSearch, router }: { search: string; setSearch:
         <span style={{ color: "#2563EB" }}>lost</span>
       </h1>
       <p style={{ fontSize: isMobile ? 14 : 16, color: "#64748B", maxWidth: 520, margin: "0 auto 32px", lineHeight: 1.65, padding: isMobile ? "0 4px" : 0 }}>
-        FoundLink bridges the gap between lost items and their owners through community-powered discovery. Report found items or search for your belongings with ease.
+        LostandFound bridges the gap between lost items and their owners through community-powered discovery. Report found items or search for your belongings with ease.
       </p>
 
       {/* Search bar */}
@@ -308,8 +308,8 @@ function Footer() {
     <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: isMobile ? "24px 16px" : "32px 24px" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: 16 }}>
         <div>
-          <p style={{ fontWeight: 700, fontSize: 16, color: "#1E3A8A", margin: "0 0 4px" }}>FoundLink</p>
-          <p style={{ fontSize: 12, color: "#94A3B8", margin: 0 }}>© 2024 FoundLink. All rights reserved.<br />Your local community lost and found.</p>
+          <p style={{ fontWeight: 700, fontSize: 16, color: "#1E3A8A", margin: "0 0 4px" }}>LostandFound</p>
+          <p style={{ fontSize: 12, color: "#94A3B8", margin: 0 }}>© 2024 LostandFound. All rights reserved.<br />Your local community lost and found.</p>
         </div>
         <div style={{ display: "flex", gap: isMobile ? 12 : 24, flexWrap: "wrap" }}>
           {[{ name: "Community Guidelines", url: "/community-guidelines" }, { name: "Safety Tips", url: "/safety-tips" }, { name: "Privacy Policy", url: "/privacy-policy" }, { name: "Contact Support", url: "/contact-support" }, { name: "How it Works", url: "/how-it-works" }].map((link) => (

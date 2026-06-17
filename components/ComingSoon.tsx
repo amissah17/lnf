@@ -6,7 +6,7 @@ export default function ComingSoonPage({ title }: { title: string }) {
     <div style={{ minHeight: "100vh", background: "#F8FAFC", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", display: "flex", flexDirection: "column" }}>
       {/* Navbar */}
       <nav style={{ background: "#fff", borderBottom: "1px solid #E2E8F0", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <a href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", textDecoration: "none", letterSpacing: "-0.5px" }}>FoundLink</a>
+        <a href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", textDecoration: "none", letterSpacing: "-0.5px" }}>LostandFound</a>
         <a href="/" style={{ fontSize: 14, color: "#2563EB", fontWeight: 600, textDecoration: "none" }}>← Back to Home</a>
       </nav>
 
@@ -45,7 +45,7 @@ export default function ComingSoonPage({ title }: { title: string }) {
 
       {/* Footer */}
       <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "20px 24px", textAlign: "center" }}>
-        <p style={{ fontSize: 12, color: "#94A3B8", margin: 0 }}>© 2024 FoundLink. All rights reserved.</p>
+        <p style={{ fontSize: 12, color: "#94A3B8", margin: 0 }}>© 2024 LostandFound. All rights reserved.</p>
       </footer>
     </div>
   );

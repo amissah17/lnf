@@ -91,7 +91,7 @@ function Navbar() {
   return (
     <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", borderBottom: "1px solid #E2E8F0" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-        <a href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none", flexShrink: 0 }}>FoundLink</a>
+        <a href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none", flexShrink: 0 }}>LostandFound</a>
 
         {isMobile ? (
           // Mobile: icons + hamburger
@@ -384,12 +384,12 @@ export default function MyListingsPage() {
       <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: isMobile ? "24px 16px" : "28px 24px" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: isMobile ? 16 : 12 }}>
           <div>
-            <p style={{ fontWeight: 700, fontSize: 15, color: "#1E3A8A", marginBottom: 2 }}>FoundLink</p>
-            <p style={{ fontSize: 12, color: "#94A3B8" }}>© 2024 FoundLink. All rights reserved.</p>
+            <p style={{ fontWeight: 700, fontSize: 15, color: "#1E3A8A", marginBottom: 2 }}>LostandFound</p>
+            <p style={{ fontSize: 12, color: "#94A3B8" }}>© 2024 LostandFound. All rights reserved.</p>
           </div>
           <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexWrap: "wrap" }}>
-            {["Community Guidelines", "Safety Tips", "Privacy Policy", "Contact Support"].map((l) => (
-              <a key={l} href="#" style={{ fontSize: isMobile ? 12 : 13, color: "#64748B", textDecoration: "none" }}>{l}</a>
+            {[{name:"Community Guidelines", url: "/community-guidelines"}, {name:"Safety Tips", url: "/safety-tips"}, {name:"Privacy Policy", url: "/privacy-policy"}, {name:"Contact Support", url: "/contact-support"}].map((l) => (
+              <a key={l.name} href={l.url} style={{ fontSize: isMobile ? 12 : 13, color: "#64748B", textDecoration: "none" }}>{l.name}</a>
             ))}
           </div>
         </div>

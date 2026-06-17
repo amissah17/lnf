@@ -145,7 +145,7 @@ function Navbar({ navSearch, setNavSearch, onSearch }: { navSearch: string; setN
   return (
     <nav style={{ background: "#fff", borderBottom: "1px solid #E2E8F0", position: "sticky", top: 0, zIndex: 50 }}>
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none" }}>FoundLink</Link>
+        <Link href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none" }}>LostandFound</Link>
 
         {isMobile ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -299,7 +299,7 @@ function StepOne({ form, setForm }: { form: FormData; setForm: React.Dispatch<Re
       <div style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 12, padding: "14px 16px" }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
           <ShieldIcon />
-          <p style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6, margin: 0 }}>Your safety is our priority. FoundLink never shares your exact address or private contact details until you choose to reveal them in a secure message.</p>
+          <p style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6, margin: 0 }}>Your safety is our priority. LostandFound never shares your exact address or private contact details until you choose to reveal them in a secure message.</p>
         </div>
       </div>
     </div>
@@ -588,8 +588,8 @@ export default function ReportLostPage() {
       <footer style={{ borderTop: "1px solid #E2E8F0", background: "#fff", padding: isMobile ? "24px 16px" : "24px", marginTop: 40 }}>
         <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: 16 }}>
           <div>
-            <p style={{ fontWeight: 700, fontSize: 16, color: "#1E3A8A", margin: "0 0 2px" }}>FoundLink</p>
-            <p style={{ fontSize: 12, color: "#94A3B8", margin: 0 }}>© 2024 FoundLink. All rights reserved. Your local community lost and found.</p>
+            <p style={{ fontWeight: 700, fontSize: 16, color: "#1E3A8A", margin: "0 0 2px" }}>LostandFound</p>
+            <p style={{ fontSize: 12, color: "#94A3B8", margin: 0 }}>© 2024 LostandFound. All rights reserved. Your local community lost and found.</p>
           </div>
           <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexWrap: "wrap" }}>
             {[{ name: "Community Guidelines", url: "/community-guidelines" }, { name: "Safety Tips", url: "/safety-tips" }, { name: "Privacy Policy", url: "/privacy-policy" }, { name: "Contact Support", url: "/contact-support" }, { name: "How it Works", url: "/how-it-works" }].map((l) => (
