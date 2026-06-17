@@ -53,42 +53,109 @@ const EditIcon = () => (
     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
   </svg>
 );
+const MenuIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+  </svg>
+);
+const XIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+// ─── useIsMobile hook ─────────────────────────────────────────────────────────
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < breakpoint);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [breakpoint]);
+  return isMobile;
+}
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 function Navbar() {
   const router = useRouter();
+  const isMobile = useIsMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [navQuery, setNavQuery] = useState("");
+
+  function goSearch(closeMenu = false) {
+    router.push(navQuery.trim() ? `/search?q=${encodeURIComponent(navQuery.trim())}` : "/search");
+    if (closeMenu) setMenuOpen(false);
+  }
+
   return (
     <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", borderBottom: "1px solid #E2E8F0" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
         <a href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none", flexShrink: 0 }}>FoundLink</a>
-        <div style={{ display: "flex", gap: 24, flexShrink: 0 }}>
+
+        {isMobile ? (
+          // Mobile: icons + hamburger
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <a href="/messages" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><MessageIcon /></a>
+            <a href="/profile" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><UserIcon /></a>
+            <button onClick={() => setMenuOpen(!menuOpen)} style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#475569" }}>
+              {menuOpen ? <XIcon /> : <MenuIcon />}
+            </button>
+          </div>
+        ) : (
+          // Desktop: nav links + search + icons
+          <>
+            <div style={{ display: "flex", gap: 24, flexShrink: 0 }}>
+              {[["Home", "/"], ["Search", "/search"], ["Post", "/post"]].map(([label, href]) => (
+                <a key={label} href={href} style={{ fontSize: 14, fontWeight: 400, color: "#475569", textDecoration: "none" }}>{label}</a>
+              ))}
+            </div>
+            <div style={{ flex: 1, maxWidth: 400, display: "flex", background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 99, overflow: "hidden" }}>
+              <div style={{ padding: "0 12px", display: "flex", alignItems: "center", color: "#94A3B8" }}><SearchIcon /></div>
+              <input
+                value={navQuery}
+                onChange={(e) => setNavQuery(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") goSearch(); }}
+                placeholder="Search items..."
+                style={{ flex: 1, border: "none", background: "transparent", fontSize: 13, color: "#0F172A", padding: "10px 0", outline: "none", fontFamily: "inherit" }}
+              />
+              <button onClick={() => goSearch()} style={{ background: "#2563EB", color: "#fff", border: "none", padding: "0 16px", fontWeight: 600, fontSize: 13, cursor: "pointer", borderRadius: "0 99px 99px 0" }}>Search</button>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <a href="/messages" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><MessageIcon /></a>
+              <a href="/profile" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><UserIcon /></a>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Mobile menu dropdown */}
+      {isMobile && menuOpen && (
+        <div style={{ background: "#fff", borderTop: "1px solid #F1F5F9", padding: "12px 24px 20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 99, padding: "8px 16px", marginBottom: 16 }}>
+            <SearchIcon />
+            <input
+              value={navQuery}
+              onChange={(e) => setNavQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") goSearch(true); }}
+              placeholder="Search items..."
+              style={{ flex: 1, border: "none", background: "transparent", fontSize: 14, color: "#0F172A", outline: "none" }}
+            />
+          </div>
           {[["Home", "/"], ["Search", "/search"], ["Post", "/post"]].map(([label, href]) => (
-            <a key={label} href={href} style={{ fontSize: 14, fontWeight: 400, color: "#475569", textDecoration: "none" }}>{label}</a>
+            <a key={label} href={href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", fontSize: 15, fontWeight: 400, color: "#475569", textDecoration: "none", borderBottom: "1px solid #F1F5F9" }}>
+              {label}
+            </a>
           ))}
         </div>
-        <div style={{ flex: 1, maxWidth: 400, display: "flex", background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 99, overflow: "hidden" }}>
-          <div style={{ padding: "0 12px", display: "flex", alignItems: "center", color: "#94A3B8" }}><SearchIcon /></div>
-          <input
-            value={navQuery}
-            onChange={(e) => setNavQuery(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") router.push(navQuery.trim() ? `/search?q=${encodeURIComponent(navQuery.trim())}` : "/search"); }}
-            placeholder="Search items..."
-            style={{ flex: 1, border: "none", background: "transparent", fontSize: 13, color: "#0F172A", padding: "10px 0", outline: "none", fontFamily: "inherit" }}
-          />
-          <button onClick={() => router.push(navQuery.trim() ? `/search?q=${encodeURIComponent(navQuery.trim())}` : "/search")} style={{ background: "#2563EB", color: "#fff", border: "none", padding: "0 16px", fontWeight: 600, fontSize: 13, cursor: "pointer", borderRadius: "0 99px 99px 0" }}>Search</button>
-        </div>
-        <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <a href="/messages" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><MessageIcon /></a>
-          <a href="/profile" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><UserIcon /></a>
-        </div>
-      </div>
+      )}
     </nav>
   );
 }
 
 // ─── Item Card ────────────────────────────────────────────────────────────────
 function ItemCard({ item, onDelete }: { item: Item; onDelete: (id: string) => void }) {
+  const isMobile = useIsMobile();
   const [hovered, setHovered] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const isFound = item.status === "found";
@@ -107,7 +174,7 @@ function ItemCard({ item, onDelete }: { item: Item; onDelete: (id: string) => vo
       }}
     >
       {/* Image */}
-      <div style={{ position: "relative", height: 180, background: "#F1F5F9", overflow: "hidden" }}>
+      <div style={{ position: "relative", height: isMobile ? 130 : 180, background: "#F1F5F9", overflow: "hidden" }}>
         {item.photos?.[0] ? (
           <img src={item.photos[0]} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover", transform: hovered ? "scale(1.04)" : "scale(1)", transition: "transform 0.3s" }} />
         ) : (
@@ -119,31 +186,31 @@ function ItemCard({ item, onDelete }: { item: Item; onDelete: (id: string) => vo
       </div>
 
       {/* Body */}
-      <div style={{ padding: "14px 16px 16px" }}>
-        <p style={{ fontWeight: 700, fontSize: 14, color: "#0F172A", marginBottom: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.title}</p>
-        <p style={{ fontSize: 11, color: "#94A3B8", marginBottom: 6 }}>{item.category} · {date}</p>
-        <p style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#64748B", marginBottom: 16 }}>
+      <div style={{ padding: isMobile ? "12px 12px 14px" : "14px 16px 16px" }}>
+        <p style={{ fontWeight: 700, fontSize: isMobile ? 13 : 14, color: "#0F172A", marginBottom: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.title}</p>
+        <p style={{ fontSize: 11, color: "#94A3B8", marginBottom: 6, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.category} · {date}</p>
+        <p style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#64748B", marginBottom: isMobile ? 12 : 16, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           <MapPinIcon /> {item.location}
         </p>
 
         {/* Actions */}
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: isMobile ? 6 : 8 }}>
           <a
             href={`/items/${item.id}`}
-            style={{ flex: 1, padding: "8px 0", border: "1.5px solid #2563EB", borderRadius: 8, background: "transparent", color: "#2563EB", fontWeight: 600, fontSize: 13, textAlign: "center", textDecoration: "none", display: "block" }}
+            style={{ flex: 1, padding: isMobile ? "7px 0" : "8px 0", border: "1.5px solid #2563EB", borderRadius: 8, background: "transparent", color: "#2563EB", fontWeight: 600, fontSize: isMobile ? 12 : 13, textAlign: "center", textDecoration: "none", display: "block" }}
           >
             View
           </a>
           <a
             href={`/items/${item.id}/edit`}
-            style={{ width: 36, height: 36, border: "1.5px solid #E2E8F0", borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", textDecoration: "none" }}
+            style={{ width: isMobile ? 32 : 36, height: isMobile ? 32 : 36, flexShrink: 0, border: "1.5px solid #E2E8F0", borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", textDecoration: "none" }}
           >
             <EditIcon />
           </a>
           {confirmDelete ? (
             <button
               onClick={() => onDelete(item.id)}
-              style={{ width: 36, height: 36, border: "1.5px solid #EF4444", borderRadius: 8, background: "#FEF2F2", display: "flex", alignItems: "center", justifyContent: "center", color: "#EF4444", cursor: "pointer" }}
+              style={{ width: isMobile ? 32 : 36, height: isMobile ? 32 : 36, flexShrink: 0, border: "1.5px solid #EF4444", borderRadius: 8, background: "#FEF2F2", display: "flex", alignItems: "center", justifyContent: "center", color: "#EF4444", cursor: "pointer" }}
               title="Confirm delete"
             >
               <TrashIcon />
@@ -151,7 +218,7 @@ function ItemCard({ item, onDelete }: { item: Item; onDelete: (id: string) => vo
           ) : (
             <button
               onClick={() => setConfirmDelete(true)}
-              style={{ width: 36, height: 36, border: "1.5px solid #E2E8F0", borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#94A3B8", cursor: "pointer" }}
+              style={{ width: isMobile ? 32 : 36, height: isMobile ? 32 : 36, flexShrink: 0, border: "1.5px solid #E2E8F0", borderRadius: 8, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#94A3B8", cursor: "pointer" }}
               title="Delete item"
             >
               <TrashIcon />
@@ -168,8 +235,9 @@ function ItemCard({ item, onDelete }: { item: Item; onDelete: (id: string) => vo
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
 function EmptyState() {
+  const isMobile = useIsMobile();
   return (
-    <div style={{ textAlign: "center", padding: "80px 24px", gridColumn: "1 / -1" }}>
+    <div style={{ textAlign: "center", padding: isMobile ? "56px 16px" : "80px 24px", gridColumn: "1 / -1" }}>
       <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#F1F5F9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
         <SearchIcon />
       </div>
@@ -187,6 +255,7 @@ function EmptyState() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function MyListingsPage() {
   const supabase = createClient();
+  const isMobile = useIsMobile();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "found" | "lost">("all");
@@ -225,13 +294,15 @@ export default function MyListingsPage() {
   }
 
   const filtered = filter === "all" ? items : items.filter((i) => i.status === filter);
+  const gridColumns = isMobile ? "repeat(2, 1fr)" : "repeat(auto-fill, minmax(260px, 1fr))";
+  const gridGap = isMobile ? 12 : 20;
 
   return (
     <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: "#F8FAFC", minHeight: "100vh" }}>
       {/* Toast */}
       {toast && (
         <div style={{
-          position: "fixed", top: 20, right: 20, zIndex: 9999,
+          position: "fixed", top: isMobile ? 12 : 20, right: isMobile ? 12 : 20, left: isMobile ? 12 : "auto", zIndex: 9999,
           padding: "12px 16px", borderRadius: 10, fontSize: 14, fontWeight: 500,
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
           ...(toast.type === "success"
@@ -244,32 +315,32 @@ export default function MyListingsPage() {
 
       <Navbar />
 
-      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px 64px" }}>
+      <main style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "20px 16px 40px" : "32px 24px 64px" }}>
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
+        <div style={{ display: "flex", alignItems: isMobile ? "flex-start" : "center", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", marginBottom: isMobile ? 20 : 24, gap: isMobile ? 12 : 16 }}>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.5px", marginBottom: 4 }}>My Listings</h1>
+            <h1 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.5px", marginBottom: 4 }}>My Listings</h1>
             <p style={{ fontSize: 14, color: "#64748B" }}>
               {loading ? "Loading…" : `${filtered.length} item${filtered.length !== 1 ? "s" : ""}`}
             </p>
           </div>
           <a
             href="/post"
-            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", borderRadius: 99, background: "#2563EB", color: "#fff", fontWeight: 600, fontSize: 14, textDecoration: "none" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: isMobile ? "9px 18px" : "10px 20px", borderRadius: 99, background: "#2563EB", color: "#fff", fontWeight: 600, fontSize: isMobile ? 13 : 14, textDecoration: "none" }}
           >
             <PlusIcon /> Post Item
           </a>
         </div>
 
         {/* Filter tabs */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 24, background: "#F1F5F9", borderRadius: 10, padding: 4, width: "fit-content" }}>
+        <div style={{ display: "flex", gap: 4, marginBottom: isMobile ? 20 : 24, background: "#F1F5F9", borderRadius: 10, padding: 4, width: "fit-content", maxWidth: "100%", overflowX: "auto" }}>
           {(["all", "found", "lost"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setFilter(tab)}
               style={{
-                padding: "7px 20px", borderRadius: 8, border: "none", cursor: "pointer",
-                fontSize: 13, fontWeight: 600, transition: "all 0.15s",
+                padding: isMobile ? "6px 14px" : "7px 20px", borderRadius: 8, border: "none", cursor: "pointer",
+                fontSize: 13, fontWeight: 600, transition: "all 0.15s", whiteSpace: "nowrap",
                 background: filter === tab ? "#fff" : "transparent",
                 color: filter === tab ? "#0F172A" : "#64748B",
                 boxShadow: filter === tab ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
@@ -286,11 +357,11 @@ export default function MyListingsPage() {
 
         {/* Grid */}
         {loading ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: gridColumns, gap: gridGap }}>
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} style={{ background: "#fff", borderRadius: 14, border: "1px solid #E2E8F0", overflow: "hidden" }}>
-                <div style={{ height: 180, background: "linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.2s infinite" }} />
-                <div style={{ padding: 16 }}>
+                <div style={{ height: isMobile ? 130 : 180, background: "linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.2s infinite" }} />
+                <div style={{ padding: isMobile ? 12 : 16 }}>
                   <div style={{ height: 14, background: "#F1F5F9", borderRadius: 4, marginBottom: 8, width: "70%" }} />
                   <div style={{ height: 12, background: "#F1F5F9", borderRadius: 4, width: "40%" }} />
                 </div>
@@ -301,7 +372,7 @@ export default function MyListingsPage() {
         ) : filtered.length === 0 ? (
           <EmptyState />
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: gridColumns, gap: gridGap }}>
             {filtered.map((item) => (
               <ItemCard key={item.id} item={item} onDelete={handleDelete} />
             ))}
@@ -310,15 +381,15 @@ export default function MyListingsPage() {
       </main>
 
       {/* Footer */}
-      <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "28px 24px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+      <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: isMobile ? "24px 16px" : "28px 24px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: isMobile ? 16 : 12 }}>
           <div>
             <p style={{ fontWeight: 700, fontSize: 15, color: "#1E3A8A", marginBottom: 2 }}>FoundLink</p>
             <p style={{ fontSize: 12, color: "#94A3B8" }}>© 2024 FoundLink. All rights reserved.</p>
           </div>
-          <div style={{ display: "flex", gap: 20 }}>
+          <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexWrap: "wrap" }}>
             {["Community Guidelines", "Safety Tips", "Privacy Policy", "Contact Support"].map((l) => (
-              <a key={l} href="#" style={{ fontSize: 13, color: "#64748B", textDecoration: "none" }}>{l}</a>
+              <a key={l} href="#" style={{ fontSize: isMobile ? 12 : 13, color: "#64748B", textDecoration: "none" }}>{l}</a>
             ))}
           </div>
         </div>

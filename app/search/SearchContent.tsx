@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Item {
@@ -20,6 +21,18 @@ interface Item {
 const CATEGORIES = ["Electronics", "Clothing", "Accessories", "Pets", "Wallets", "Keys", "Bags", "Documents", "Jewelry", "Other"];
 const CONDITIONS = ["Excellent", "Good", "Fair", "Poor"];
 const STATUSES = [{ value: "found", label: "Found" }, { value: "lost", label: "Lost" }];
+
+// ─── useIsMobile hook ─────────────────────────────────────────────────────────
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < breakpoint);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [breakpoint]);
+  return isMobile;
+}
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const SearchIcon = () => (
@@ -52,41 +65,92 @@ const UserIcon = () => (
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
   </svg>
 );
+const MenuIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+);
+const CloseIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 function Navbar({ query, setQuery, onSearch }: { query: string; setQuery: (q: string) => void; onSearch: () => void }) {
+  const isMobile = useIsMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", borderBottom: "1px solid #E2E8F0" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-        <a href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none", flexShrink: 0 }}>FoundLink</a>
-        <div style={{ display: "flex", gap: 24, flexShrink: 0 }}>
+        <Link href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none", flexShrink: 0 }}>FoundLink</Link>
+
+        {isMobile ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Link href="/messages" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}>
+              <MessageIcon />
+            </Link>
+            <Link href="/profile" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}>
+              <UserIcon />
+            </Link>
+            <button onClick={() => setMenuOpen(!menuOpen)} style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#475569" }}>
+              {menuOpen ? <CloseIcon /> : <MenuIcon />}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div style={{ display: "flex", gap: 24, flexShrink: 0 }}>
+              {[["Home", "/"], ["Search", "/search"], ["Post", "/post"]].map(([label, href]) => (
+                <Link key={label} href={href} style={{ fontSize: 14, fontWeight: label === "Search" ? 600 : 400, color: label === "Search" ? "#2563EB" : "#475569", textDecoration: label === "Search" ? "underline" : "none", textUnderlineOffset: 4 }}>{label}</Link>
+              ))}
+            </div>
+            {/* Desktop search bar */}
+            <div style={{ flex: 1, maxWidth: 400, display: "flex", background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 99, overflow: "hidden" }}>
+              <div style={{ padding: "0 12px", display: "flex", alignItems: "center", color: "#94A3B8" }}><SearchIcon /></div>
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && onSearch()}
+                placeholder="Search items..."
+                style={{ flex: 1, border: "none", background: "transparent", fontSize: 13, color: "#0F172A", padding: "10px 0", outline: "none", fontFamily: "inherit" }}
+              />
+              <button onClick={onSearch} style={{ background: "#2563EB", color: "#fff", border: "none", padding: "0 16px", fontWeight: 600, fontSize: 13, cursor: "pointer", borderRadius: "0 99px 99px 0" }}>Search</button>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <Link href="/messages" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><MessageIcon /></Link>
+              <Link href="/profile" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><UserIcon /></Link>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Mobile dropdown menu */}
+      {isMobile && menuOpen && (
+        <div style={{ background: "#fff", borderTop: "1px solid #F1F5F9", padding: "12px 24px 20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 99, padding: "8px 16px", marginBottom: 16 }}>
+            <SearchIcon />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { onSearch(); setMenuOpen(false); } }}
+              placeholder="Search items..."
+              style={{ flex: 1, border: "none", background: "transparent", fontSize: 14, color: "#64748B", outline: "none" }}
+            />
+          </div>
           {[["Home", "/"], ["Search", "/search"], ["Post", "/post"]].map(([label, href]) => (
-            <a key={label} href={href} style={{ fontSize: 14, fontWeight: label === "Search" ? 600 : 400, color: label === "Search" ? "#2563EB" : "#475569", textDecoration: label === "Search" ? "underline" : "none", textUnderlineOffset: 4 }}>{label}</a>
+            <Link key={label} href={href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", fontSize: 15, fontWeight: label === "Search" ? 600 : 400, color: label === "Search" ? "#2563EB" : "#475569", textDecoration: "none", borderBottom: "1px solid #F1F5F9" }}>
+              {label}
+            </Link>
           ))}
         </div>
-        {/* Navbar search */}
-        <div style={{ flex: 1, maxWidth: 400, display: "flex", background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 99, overflow: "hidden" }}>
-          <div style={{ padding: "0 12px", display: "flex", alignItems: "center", color: "#94A3B8" }}><SearchIcon /></div>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && onSearch()}
-            placeholder="Search items..."
-            style={{ flex: 1, border: "none", background: "transparent", fontSize: 13, color: "#0F172A", padding: "10px 0", outline: "none", fontFamily: "inherit" }}
-          />
-          <button onClick={onSearch} style={{ background: "#2563EB", color: "#fff", border: "none", padding: "0 16px", fontWeight: 600, fontSize: 13, cursor: "pointer", borderRadius: "0 99px 99px 0" }}>Search</button>
-        </div>
-        <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
-          <a href="/messages" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><MessageIcon /></a>
-          <a href="/auth/login" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}><UserIcon /></a>
-        </div>
-      </div>
+      )}
     </nav>
   );
 }
 
-// ─── Sidebar Filters ──────────────────────────────────────────────────────────
-function Sidebar({ filters, setFilters, onReset }: {
+// ─── Filter Panel Content (shared between sidebar & drawer) ───────────────────
+function FilterPanelContent({ filters, setFilters, onReset }: {
   filters: { category: string; condition: string; status: string };
   setFilters: (f: any) => void;
   onReset: () => void;
@@ -99,13 +163,12 @@ function Sidebar({ filters, setFilters, onReset }: {
   );
 
   return (
-    <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", padding: 20, position: "sticky", top: 76 }}>
+    <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <p style={{ fontWeight: 700, fontSize: 15, color: "#0F172A", display: "flex", alignItems: "center", gap: 6 }}><FilterIcon /> Filters</p>
+        <p style={{ fontWeight: 700, fontSize: 15, color: "#0F172A", display: "flex", alignItems: "center", gap: 6, margin: 0 }}><FilterIcon /> Filters</p>
         <button onClick={onReset} style={{ fontSize: 12, color: "#2563EB", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>Reset all</button>
       </div>
 
-      {/* Status */}
       <Section title="Status">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {[{ value: "", label: "All" }, ...STATUSES].map(({ value, label }) => (
@@ -117,7 +180,6 @@ function Sidebar({ filters, setFilters, onReset }: {
         </div>
       </Section>
 
-      {/* Category */}
       <Section title="Category">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {[{ value: "", label: "All Categories" }, ...CATEGORIES.map((c) => ({ value: c, label: c }))].map(({ value, label }) => (
@@ -129,7 +191,6 @@ function Sidebar({ filters, setFilters, onReset }: {
         </div>
       </Section>
 
-      {/* Condition */}
       <Section title="Condition">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {[{ value: "", label: "Any" }, ...CONDITIONS.map((c) => ({ value: c, label: c }))].map(({ value, label }) => (
@@ -140,7 +201,49 @@ function Sidebar({ filters, setFilters, onReset }: {
           ))}
         </div>
       </Section>
+    </>
+  );
+}
+
+// ─── Sidebar (desktop) ────────────────────────────────────────────────────────
+function Sidebar({ filters, setFilters, onReset }: {
+  filters: { category: string; condition: string; status: string };
+  setFilters: (f: any) => void;
+  onReset: () => void;
+}) {
+  return (
+    <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", padding: 20, position: "sticky", top: 76 }}>
+      <FilterPanelContent filters={filters} setFilters={setFilters} onReset={onReset} />
     </div>
+  );
+}
+
+// ─── Filter Drawer (mobile) ───────────────────────────────────────────────────
+function FilterDrawer({ open, onClose, filters, setFilters, onReset }: {
+  open: boolean;
+  onClose: () => void;
+  filters: { category: string; condition: string; status: string };
+  setFilters: (f: any) => void;
+  onReset: () => void;
+}) {
+  if (!open) return null;
+  return (
+    <>
+      {/* Backdrop */}
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 98 }} />
+      {/* Drawer */}
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderRadius: "20px 20px 0 0", padding: "20px 20px 36px", zIndex: 99, maxHeight: "82vh", overflowY: "auto" }}>
+        {/* Handle */}
+        <div style={{ width: 36, height: 4, background: "#E2E8F0", borderRadius: 99, margin: "0 auto 20px" }} />
+        <FilterPanelContent filters={filters} setFilters={setFilters} onReset={onReset} />
+        <button
+          onClick={onClose}
+          style={{ width: "100%", padding: "12px 0", background: "#2563EB", color: "#fff", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 14, cursor: "pointer", marginTop: 4 }}
+        >
+          Show Results
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -151,7 +254,7 @@ function ItemCard({ item }: { item: Item }) {
   const date = new Date(item.found_date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
   return (
-    <a href={`/items/${item.id}`} style={{ textDecoration: "none" }}>
+    <Link href={`/items/${item.id}`} style={{ textDecoration: "none", display: "block", minWidth: 0 }}>
       <div
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -161,33 +264,32 @@ function ItemCard({ item }: { item: Item }) {
           boxShadow: hovered ? "0 8px 24px rgba(37,99,235,0.1)" : "0 1px 4px rgba(0,0,0,0.04)",
           transform: hovered ? "translateY(-2px)" : "translateY(0)",
           transition: "all 0.2s ease", cursor: "pointer",
+          height: "100%",
         }}
       >
-        {/* Image */}
-        <div style={{ position: "relative", height: 180, background: "#F1F5F9", overflow: "hidden" }}>
+        <div style={{ position: "relative", height: 150, background: "#F1F5F9", overflow: "hidden", flexShrink: 0 }}>
           {item.photos?.[0] ? (
             <img src={item.photos[0]} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover", transform: hovered ? "scale(1.04)" : "scale(1)", transition: "transform 0.3s" }} />
           ) : (
-            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#CBD5E1", fontSize: 13 }}>No photo</div>
+            <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#CBD5E1", fontSize: 12 }}>No photo</div>
           )}
-          <span style={{ position: "absolute", top: 10, left: 10, background: isFound ? "#059669" : "#EF4444", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 9px", borderRadius: 99, textTransform: "uppercase", letterSpacing: "0.5px" }}>
+          <span style={{ position: "absolute", top: 8, left: 8, background: isFound ? "#059669" : "#EF4444", color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 99, textTransform: "uppercase", letterSpacing: "0.5px" }}>
             {isFound ? "Found" : "Lost"}
           </span>
         </div>
-
-        {/* Body */}
-        <div style={{ padding: "14px 16px 16px" }}>
-          <p style={{ fontWeight: 700, fontSize: 14, color: "#0F172A", marginBottom: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.title}</p>
-          <p style={{ fontSize: 11, color: "#94A3B8", marginBottom: 6 }}>{item.category} · {date}</p>
-          <p style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#64748B", marginBottom: 14 }}>
-            <MapPinIcon /> {item.location}
+        <div style={{ padding: "10px 12px 12px" }}>
+          <p style={{ fontWeight: 700, fontSize: 13, color: "#0F172A", marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>{item.title}</p>
+          <p style={{ fontSize: 10, color: "#94A3B8", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.category} · {date}</p>
+          <p style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "#64748B", marginBottom: 10, overflow: "hidden", minWidth: 0 }}>
+            <span style={{ flexShrink: 0 }}><MapPinIcon /></span>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.location}</span>
           </p>
-          <div style={{ width: "100%", padding: "8px 0", border: "1.5px solid #2563EB", borderRadius: 8, background: "transparent", color: "#2563EB", fontWeight: 600, fontSize: 13, textAlign: "center" }}>
+          <div style={{ width: "100%", padding: "7px 0", border: "1.5px solid #2563EB", borderRadius: 8, background: "transparent", color: "#2563EB", fontWeight: 600, fontSize: 12, textAlign: "center" }}>
             View Details
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
 
@@ -202,9 +304,9 @@ function EmptyState({ query }: { query: string }) {
       <p style={{ fontSize: 14, color: "#64748B", maxWidth: 340, margin: "0 auto 24px", lineHeight: 1.6 }}>
         {query ? `No results for "${query}". Try different keywords or adjust your filters.` : "No items match your filters. Try resetting them."}
       </p>
-      <a href="/post" style={{ display: "inline-block", padding: "10px 24px", borderRadius: 99, background: "#2563EB", color: "#fff", fontWeight: 600, fontSize: 14, textDecoration: "none" }}>
+      <Link href="/post" style={{ display: "inline-block", padding: "10px 24px", borderRadius: 99, background: "#2563EB", color: "#fff", fontWeight: 600, fontSize: 14, textDecoration: "none" }}>
         Report a Found Item
-      </a>
+      </Link>
     </div>
   );
 }
@@ -214,6 +316,7 @@ export default function SearchPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const supabase = createClient();
+  const isMobile = useIsMobile();
 
   const [query, setQuery] = useState(searchParams.get("q") || "");
   const [filters, setFilters] = useState({
@@ -224,30 +327,24 @@ export default function SearchPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
-
     let q = supabase
       .from("items")
       .select("id, title, category, description, status, location, found_date, photos, condition", { count: "exact" })
       .order("created_at", { ascending: false });
 
-    // Full-text search
     if (query.trim()) {
       q = q.textSearch("title", query.trim(), { type: "websearch", config: "english" });
     }
-
     if (filters.category) q = q.eq("category", filters.category);
     if (filters.condition) q = q.eq("condition", filters.condition);
     if (filters.status) q = q.eq("status", filters.status);
 
     const { data, error, count } = await q.limit(24);
-
-    if (!error && data) {
-      setItems(data);
-      setTotal(count || 0);
-    }
+    if (!error && data) { setItems(data); setTotal(count || 0); }
     setLoading(false);
   }, [query, filters]);
 
@@ -266,54 +363,72 @@ export default function SearchPage() {
     setQuery("");
   };
 
-  // Active filter chips
   const activeFilters = [
     filters.category && { key: "category", label: filters.category },
     filters.condition && { key: "condition", label: filters.condition },
     filters.status && { key: "status", label: filters.status === "found" ? "Found" : "Lost" },
   ].filter(Boolean) as { key: string; label: string }[];
 
+  // Responsive grid columns
+  const gridCols = isMobile ? "repeat(2, 1fr)" : "repeat(3, 1fr)";
+
   return (
     <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: "#F8FAFC", minHeight: "100vh" }}>
       <Navbar query={query} setQuery={setQuery} onSearch={handleSearch} />
 
-      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px 64px" }}>
-        {/* Header */}
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.5px", marginBottom: 4 }}>
-            {query ? `Results for "${query}"` : "Browse All Items"}
-          </h1>
-          <p style={{ fontSize: 14, color: "#64748B" }}>
-            {loading ? "Searching…" : `${total} item${total !== 1 ? "s" : ""} found`}
-          </p>
+      <main style={{ maxWidth: 1200, margin: "0 auto", padding: isMobile ? "20px 16px 64px" : "32px 24px 64px", boxSizing: "border-box", overflowX: "hidden" }}>
+        {/* Header row */}
+        <div style={{ display: "flex", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: 12, marginBottom: 20, flexDirection: isMobile ? "column" : "row" }}>
+          <div>
+            <h1 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.5px", marginBottom: 4 }}>
+              {query ? `Results for "${query}"` : "Browse All Items"}
+            </h1>
+            <p style={{ fontSize: 14, color: "#64748B" }}>
+              {loading ? "Searching…" : `${total} item${total !== 1 ? "s" : ""} found`}
+            </p>
+          </div>
+
+          {/* Mobile: Filter button */}
+          {isMobile && (
+            <button
+              onClick={() => setDrawerOpen(true)}
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 99, border: "1.5px solid #E2E8F0", background: "#fff", fontSize: 13, fontWeight: 600, color: "#475569", cursor: "pointer" }}
+            >
+              <FilterIcon />
+              Filters
+              {activeFilters.length > 0 && (
+                <span style={{ background: "#2563EB", color: "#fff", fontSize: 10, fontWeight: 700, padding: "1px 6px", borderRadius: 99, minWidth: 16, textAlign: "center" }}>
+                  {activeFilters.length}
+                </span>
+              )}
+            </button>
+          )}
         </div>
 
         {/* Active filter chips */}
         {activeFilters.length > 0 && (
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
             {activeFilters.map(({ key, label }) => (
               <span key={key} style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 99, background: "#EFF6FF", border: "1px solid #BFDBFE", fontSize: 12, color: "#2563EB", fontWeight: 600 }}>
                 {label}
-                <button onClick={() => setFilters((f) => ({ ...f, [key]: "" }))} style={{ background: "none", border: "none", cursor: "pointer", color: "#2563EB", display: "flex", padding: 0 }}><XIcon /></button>
+                <button onClick={() => setFilters((f: any) => ({ ...f, [key]: "" }))} style={{ background: "none", border: "none", cursor: "pointer", color: "#2563EB", display: "flex", padding: 0 }}><XIcon /></button>
               </span>
             ))}
           </div>
         )}
 
-        <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 24, alignItems: "start" }}>
-          {/* Sidebar */}
-          <Sidebar filters={filters} setFilters={setFilters} onReset={resetFilters} />
-
-          {/* Results */}
-          <div>
+        {/* Body: sidebar + results (desktop) / results only (mobile) */}
+        {isMobile ? (
+          // Mobile: full-width results grid
+          <div style={{ minWidth: 0 }}>
             {loading ? (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: gridCols, gap: 10 }}>
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} style={{ background: "#fff", borderRadius: 14, border: "1px solid #E2E8F0", overflow: "hidden" }}>
-                    <div style={{ height: 180, background: "linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.2s infinite" }} />
-                    <div style={{ padding: 16 }}>
-                      <div style={{ height: 14, background: "#F1F5F9", borderRadius: 4, marginBottom: 8, width: "70%" }} />
-                      <div style={{ height: 12, background: "#F1F5F9", borderRadius: 4, width: "40%" }} />
+                  <div key={i} style={{ background: "#fff", borderRadius: 14, border: "1px solid #E2E8F0", overflow: "hidden", minWidth: 0 }}>
+                    <div style={{ height: 150, background: "linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.2s infinite" }} />
+                    <div style={{ padding: 12 }}>
+                      <div style={{ height: 13, background: "#F1F5F9", borderRadius: 4, marginBottom: 8, width: "70%" }} />
+                      <div style={{ height: 11, background: "#F1F5F9", borderRadius: 4, width: "40%" }} />
                     </div>
                   </div>
                 ))}
@@ -322,24 +437,60 @@ export default function SearchPage() {
             ) : items.length === 0 ? (
               <EmptyState query={query} />
             ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: gridCols, gap: 10 }}>
                 {items.map((item) => <ItemCard key={item.id} item={item} />)}
               </div>
             )}
           </div>
-        </div>
+        ) : (
+          // Desktop: sidebar + results
+          <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 24, alignItems: "start" }}>
+            <Sidebar filters={filters} setFilters={setFilters} onReset={resetFilters} />
+            <div>
+              {loading ? (
+                <div style={{ display: "grid", gridTemplateColumns: gridCols, gap: 16 }}>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} style={{ background: "#fff", borderRadius: 14, border: "1px solid #E2E8F0", overflow: "hidden" }}>
+                      <div style={{ height: 180, background: "linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.2s infinite" }} />
+                      <div style={{ padding: 16 }}>
+                        <div style={{ height: 14, background: "#F1F5F9", borderRadius: 4, marginBottom: 8, width: "70%" }} />
+                        <div style={{ height: 12, background: "#F1F5F9", borderRadius: 4, width: "40%" }} />
+                      </div>
+                    </div>
+                  ))}
+                  <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
+                </div>
+              ) : items.length === 0 ? (
+                <EmptyState query={query} />
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: gridCols, gap: 16 }}>
+                  {items.map((item) => <ItemCard key={item.id} item={item} />)}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
 
+      {/* Mobile Filter Drawer */}
+      <FilterDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        filters={filters}
+        setFilters={setFilters}
+        onReset={resetFilters}
+      />
+
       {/* Footer */}
-      <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "28px 24px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+      <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: isMobile ? "24px 16px" : "28px 24px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: 16 }}>
           <div>
-            <p style={{ fontWeight: 700, fontSize: 15, color: "#1E3A8A", marginBottom: 2 }}>FoundLink</p>
+            <p style={{ fontWeight: 700, fontSize: isMobile ? 16 : 15, color: "#1E3A8A", marginBottom: 2 }}>FoundLink</p>
             <p style={{ fontSize: 12, color: "#94A3B8" }}>© 2024 FoundLink. All rights reserved.</p>
           </div>
-          <div style={{ display: "flex", gap: 20 }}>
-            {["Community Guidelines", "Safety Tips", "Privacy Policy", "Contact Support"].map((l) => (
-              <a key={l} href="#" style={{ fontSize: 13, color: "#64748B", textDecoration: "none" }}>{l}</a>
+          <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexWrap: "wrap" }}>
+            {[{name:"Community Guidelines", url:"/community-guidelines"}, {name:"Safety Tips", url:"/safety-tips"}, {name:"Privacy Policy", url:"/privacy-policy"}, {name:"Contact Support", url:"/contact-support"}].map((l) => (
+              <Link key={l.name} href={l.url} style={{ fontSize: isMobile ? 12 : 13, color: "#64748B", textDecoration: "none" }}>{l.name}</Link>
             ))}
           </div>
         </div>

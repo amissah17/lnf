@@ -73,43 +73,97 @@ const ArrowLeftIcon = () => (
     <path d="M19 12H5M12 19l-7-7 7-7"/>
   </svg>
 );
+const MenuIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+  </svg>
+);
+const XIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
+
+// ─── useIsMobile hook ─────────────────────────────────────────────────────────
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < breakpoint);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [breakpoint]);
+  return isMobile;
+}
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
 function Navbar() {
+  const isMobile = useIsMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navLinks: [string, string][] = [["Home", "/"], ["Search", "/search"], ["Post", "/post"]];
+
   return (
     <nav style={{ position: "sticky", top: 0, zIndex: 50, background: "#fff", borderBottom: "1px solid #E2E8F0" }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <a href="/" style={{ fontWeight: 700, fontSize: 20, color: "#1E3A8A", letterSpacing: "-0.5px", textDecoration: "none" }}>FoundLink</a>
-        <div style={{ display: "flex", gap: 32 }}>
-          {[["Home", "/"], ["Search", "/search"], ["Post", "/post"]].map(([label, href]) => (
-            <a key={label} href={href} style={{ fontSize: 14, color: "#475569", textDecoration: "none" }}>{label}</a>
+
+        {isMobile ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <a href="/messages" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}>
+              <MessageIcon />
+            </a>
+            <a href="/profile" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}>
+              <UserIcon />
+            </a>
+            <button onClick={() => setMenuOpen(!menuOpen)} style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#475569" }}>
+              {menuOpen ? <XIcon /> : <MenuIcon />}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div style={{ display: "flex", gap: 32 }}>
+              {navLinks.map(([label, href]) => (
+                <a key={label} href={href} style={{ fontSize: 14, color: "#475569", textDecoration: "none" }}>{label}</a>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <a href="/messages" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}>
+                <MessageIcon />
+              </a>
+              <a href="/profile" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}>
+                <UserIcon />
+              </a>
+            </div>
+          </>
+        )}
+      </div>
+
+      {isMobile && menuOpen && (
+        <div style={{ background: "#fff", borderTop: "1px solid #F1F5F9", padding: "12px 24px 20px" }}>
+          {navLinks.map(([label, href]) => (
+            <a key={label} href={href} onClick={() => setMenuOpen(false)} style={{ display: "block", padding: "12px 0", fontSize: 15, color: "#475569", textDecoration: "none", borderBottom: "1px solid #F1F5F9" }}>
+              {label}
+            </a>
           ))}
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <a href="/messages" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}>
-            <MessageIcon />
-          </a>
-          <a href="/auth/login" style={{ width: 36, height: 36, borderRadius: "50%", border: "1px solid #E2E8F0", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#475569" }}>
-            <UserIcon />
-          </a>
-        </div>
-      </div>
+      )}
     </nav>
   );
 }
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
 function Footer() {
+  const isMobile = useIsMobile();
   return (
-    <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "28px 24px", marginTop: 64 }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+    <footer style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: isMobile ? "24px 16px" : "28px 24px", marginTop: 64 }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", justifyContent: "space-between", gap: isMobile ? 16 : 12 }}>
         <div>
           <p style={{ fontWeight: 700, fontSize: 15, color: "#1E3A8A", marginBottom: 2 }}>FoundLink</p>
           <p style={{ fontSize: 12, color: "#94A3B8" }}>© 2024 FoundLink. All rights reserved. Your local community lost and found.</p>
         </div>
-        <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-          {["Community Guidelines", "Safety Tips", "Privacy Policy", "Contact Support", "How it Works"].map((l) => (
-            <a key={l} href="#" style={{ fontSize: 13, color: "#64748B", textDecoration: "none" }}>{l}</a>
+        <div style={{ display: "flex", gap: isMobile ? 12 : 20, flexWrap: "wrap" }}>
+          {[{name:"Community Guidelines", url:"/community-guidelines"}, {name:"Safety Tips", url:"/safety-tips"}, {name:"Privacy Policy", url:"/privacy-policy"}, {name:"Contact Support", url:"/contact-support"}, {name:"How it Works", url:"/how-it-works"}].map((l) => (
+            <a key={l.name} href={l.url} style={{ fontSize: isMobile ? 12 : 13, color: "#64748B", textDecoration: "none" }}>{l.name}</a>
           ))}
         </div>
       </div>
@@ -145,7 +199,7 @@ function ImageGallery({ photos, status }: { photos: string[]; status: string }) 
 
       {/* Thumbnails */}
       {photos.length > 1 && (
-        <div style={{ display: "flex", gap: 10 }}>
+        <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 2 }}>
           {photos.map((url, i) => (
             <button key={i} onClick={() => setActive(i)} style={{
               width: 80, height: 64, borderRadius: 8, overflow: "hidden", padding: 0, border: `2px solid ${active === i ? "#2563EB" : "#E2E8F0"}`, cursor: "pointer", flexShrink: 0,
@@ -161,11 +215,12 @@ function ImageGallery({ photos, status }: { photos: string[]; status: string }) 
 
 // ─── Claim Modal ──────────────────────────────────────────────────────────────
 function ClaimModal({ item, onClose, onSubmit }: { item: Item; onClose: () => void; onSubmit: (msg: string) => void }) {
+  const isMobile = useIsMobile();
   const [message, setMessage] = useState("");
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ background: "#fff", borderRadius: 16, padding: 32, maxWidth: 460, width: "100%" }}>
-        <h3 style={{ fontSize: 20, fontWeight: 700, color: "#0F172A", marginBottom: 8 }}>Claim this item</h3>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? 16 : 24 }}>
+      <div style={{ background: "#fff", borderRadius: 16, padding: isMobile ? "24px 20px" : 32, maxWidth: 460, width: "100%" }}>
+        <h3 style={{ fontSize: isMobile ? 18 : 20, fontWeight: 700, color: "#0F172A", marginBottom: 8 }}>Claim this item</h3>
         <p style={{ fontSize: 14, color: "#64748B", marginBottom: 20, lineHeight: 1.6 }}>
           Send a message to the finder. Be ready to verify ownership.
         </p>
@@ -181,13 +236,13 @@ function ClaimModal({ item, onClose, onSubmit }: { item: Item; onClose: () => vo
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Describe how you can prove this is yours…"
-          style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", minHeight: 100, resize: "vertical", outline: "none", marginBottom: 16 }}
+          style={{ width: "100%", padding: "11px 14px", border: "1.5px solid #E2E8F0", borderRadius: 10, fontSize: 14, fontFamily: "inherit", minHeight: 100, resize: "vertical", outline: "none", marginBottom: 16, boxSizing: "border-box" }}
           onFocus={(e) => e.target.style.borderColor = "#2563EB"}
           onBlur={(e) => e.target.style.borderColor = "#E2E8F0"}
         />
-        <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ padding: "10px 20px", borderRadius: 99, border: "1.5px solid #E2E8F0", background: "#fff", color: "#374151", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>Cancel</button>
-          <button onClick={() => onSubmit(message)} disabled={!message.trim()} style={{ padding: "10px 20px", borderRadius: 99, border: "none", background: message.trim() ? "#2563EB" : "#CBD5E1", color: "#fff", fontWeight: 600, fontSize: 14, cursor: message.trim() ? "pointer" : "not-allowed" }}>Send Message</button>
+        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", gap: 10, justifyContent: "flex-end" }}>
+          <button onClick={onClose} style={{ padding: "10px 20px", borderRadius: 99, border: "1.5px solid #E2E8F0", background: "#fff", color: "#374151", fontWeight: 600, fontSize: 14, cursor: "pointer", width: isMobile ? "100%" : "auto" }}>Cancel</button>
+          <button onClick={() => onSubmit(message)} disabled={!message.trim()} style={{ padding: "10px 20px", borderRadius: 99, border: "none", background: message.trim() ? "#2563EB" : "#CBD5E1", color: "#fff", fontWeight: 600, fontSize: 14, cursor: message.trim() ? "pointer" : "not-allowed", width: isMobile ? "100%" : "auto" }}>Send Message</button>
         </div>
       </div>
     </div>
@@ -199,6 +254,7 @@ export default function ItemDetailPage() {
   const params = useParams();
   const router = useRouter();
   const supabase = createClient();
+  const isMobile = useIsMobile();
 
   const [item, setItem] = useState<Item | null>(null);
   const [loading, setLoading] = useState(true);
@@ -317,9 +373,9 @@ export default function ItemDetailPage() {
     <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: "#F8FAFC", minHeight: "100vh" }}>
       <Navbar />
 
-      <main style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
+      <main style={{ maxWidth: 1100, margin: "0 auto", padding: isMobile ? "20px 16px" : "32px 24px" }}>
         {/* Breadcrumb */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24, fontSize: 13, color: "#64748B" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 6 : 8, marginBottom: isMobile ? 16 : 24, fontSize: isMobile ? 12 : 13, color: "#64748B", flexWrap: "wrap", rowGap: 4 }}>
           <a href="/search" style={{ display: "flex", alignItems: "center", gap: 6, color: "#64748B", textDecoration: "none" }}>
             <ArrowLeftIcon /> Back to Search
           </a>
@@ -329,13 +385,13 @@ export default function ItemDetailPage() {
           <span style={{ color: "#0F172A", fontWeight: 500 }}>Found: {item.title}</span>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 32, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 380px", gap: isMobile ? 20 : 32, alignItems: "start" }}>
           {/* Left column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? 16 : 24 }}>
             <ImageGallery photos={item.photos || []} status={item.status} />
 
             {/* Description */}
-            <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", padding: 24 }}>
+            <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", padding: isMobile ? 16 : 24 }}>
               <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", marginBottom: 14 }}>Description</h2>
               <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.75, marginBottom: item.verification_hint ? 20 : 0 }}>
                 {item.description || "No description provided."}
@@ -353,8 +409,8 @@ export default function ItemDetailPage() {
             </div>
 
             {/* Found Location */}
-            <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", padding: 24 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", padding: isMobile ? 16 : 24 }}>
+              <div style={{ display: "flex", alignItems: isMobile ? "flex-start" : "center", flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", gap: isMobile ? 8 : 0, marginBottom: 16 }}>
                 <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0F172A" }}>Found Location</h2>
                 <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, color: "#2563EB", fontWeight: 500 }}>
                   <MapPinIcon /> {item.location}
@@ -369,10 +425,10 @@ export default function ItemDetailPage() {
           </div>
 
           {/* Right column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16, position: "sticky", top: 76 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, position: isMobile ? "static" : "sticky", top: 76 }}>
             {/* Item info card */}
-            <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", padding: 24 }}>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.5px", marginBottom: 12 }}>{item.title}</h1>
+            <div style={{ background: "#fff", borderRadius: 16, border: "1px solid #E2E8F0", padding: isMobile ? 16 : 24 }}>
+              <h1 style={{ fontSize: isMobile ? 20 : 24, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.5px", marginBottom: 12 }}>{item.title}</h1>
 
               {/* Tags */}
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
@@ -384,7 +440,7 @@ export default function ItemDetailPage() {
               {/* Meta */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingBottom: 20, borderBottom: "1px solid #F1F5F9", marginBottom: 20 }}>
                 {[
-                  { icon: <CalendarIcon />, text: `Found on ${formattedDate}` },
+                  { icon: <CalendarIcon />, text: `${item.status === "lost" ? "Lost" : "Found"} on ${formattedDate}` },
                   { icon: <ClockIcon />, text: `Reported ${timeAgo}` },
                   { icon: <UserIcon />, text: `Found by ${item.profiles?.full_name || "Anonymous"}` },
                 ].map(({ icon, text }, i) => (
@@ -434,7 +490,7 @@ export default function ItemDetailPage() {
             </div>
 
             {/* Safety tips */}
-            <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 16, padding: 20 }}>
+            <div style={{ background: "#F0FDF4", border: "1px solid #BBF7D0", borderRadius: 16, padding: isMobile ? 16 : 20 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                 <ShieldIcon />
                 <p style={{ fontWeight: 700, fontSize: 14, color: "#166534" }}>Safety Tips</p>
@@ -452,7 +508,7 @@ export default function ItemDetailPage() {
             </div>
 
             {/* Ref & report */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 4px" }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "space-between", alignItems: "center", padding: "0 4px" }}>
               <p style={{ fontSize: 12, color: "#94A3B8" }}>Ref ID: FL-{item.id.slice(0, 8).toUpperCase()}</p>
               <button style={{ background: "none", border: "none", color: "#EF4444", fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
                 <AlertIcon /> Report Listing
